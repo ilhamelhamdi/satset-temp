@@ -1,11 +1,11 @@
 import MainLayout from "../components/MainLayout"
 
-const Homepage = () => {
+const Register = () => {
   return (
     <MainLayout>
-      <h1>This is Homepage</h1>
+      <h1>This is Register page</h1>
     </MainLayout>
   )
 }
 
-export default Homepage
+export default Register
