@@ -48,7 +48,7 @@ const Register = () => {
         <div className="w-full h-full flex justify-center items-center p-16 flex-col">
           <img src="webinar.jpg"/>
           <p className="text-gray-400 italic">“Education is the kindling of a flame, not the filling of a vessel.”</p>
-          <p className="text-gray-400 italic">— Socrates</p>
+          <p className="text-gray-400">— Socrates</p>
         </div>
         <div className="w-full h-full flex justify-center items-center p-2">
           <div className="w-full max-w-lg px-5 py-4 border-2 rounded-xl shadow-md my-4 bg-white">
@@ -65,12 +65,12 @@ const Register = () => {
                 <input className="hidden" type="file" accept=".jpg, .jpeg, .png" id="upload-button" onChange={handleImage}/>
               </div>
               <div className="col-span-3">
-                <label className="block text-gray-700 text-sm font-bold mb-2" for="name">Name</label>
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">Name</label>
                 <input className="w-full border-2 rounded-md py-2 px-2" type="text" value={name} onChange={e => setName(e.target.value)}/>
               </div>
             </div>
             <div className="mb-3">
-              <label className="block text-gray-700 text-sm font-bold mb-2" for="gender">Gender</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="gender">Gender</label>
               <div className="relative">
                 <select onChange={e => setGender(e.target.value)} className="block appearance-none w-full border-2 border-gray-200 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white">
                   <option value="m" >Male</option>
@@ -82,15 +82,15 @@ const Register = () => {
               </div>
             </div>
             <div className="mb-3">
-              <label className="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Email</label>
               <input className="w-full border-2 rounded-md py-2 px-2" type="email" value={email} onChange={e => setEmail(e.target.value)}/>
             </div>
             <div className="mb-3">
-              <label className="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">Password</label>
               <input className="w-full border-2 rounded-md py-2 px-2" type="password" value={password} onChange={e => setPassword(e.target.value)}/>
             </div>
             <div className="mb-3">
-              <label className="block text-gray-700 text-sm font-bold mb-2" for="role">Role</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">Role</label>
               <div className="relative">
                 <select onChange={e => setRole(e.target.value)} className="block appearance-none w-full border-2 border-gray-200 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white">
                   <option value="student">Student</option>
