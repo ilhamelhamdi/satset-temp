@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import Icons from "../icons"
 import Button from "./Button"
 
-const NavBar = () => {
+const AuthBar = () => {
   return (
     <div>
       <Link to='login' className="mx-2">
@@ -17,7 +17,24 @@ const NavBar = () => {
   )
 }
 
-const NavBarMobile = () => {
+const UserBar = () => {
+  return (
+    <div className="group h-full flex items-center justify-end relative">
+      <div className="flex items-center space-x-2">
+        <img src="default-user.png" alt="" className="h-12" />
+        <span>User</span>
+        <Icons.Dropdown className="h-6" />
+      </div>
+      <div className="w-40 bg-white shadow-lg hidden group-hover:block hover:block absolute right-0 top-16 border border-slate-200 p-4 z-20">
+        <Link to='/logout'>
+          <span className="hover:text-teal-700 hover:underline inline-block w-full">Log out</span>
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+const MenuButton = () => {
   return (
     <div>
       <Icons.Menu className="fill-teal-700" />
@@ -41,18 +58,27 @@ const Header = () => {
 
   return (
     <header className="w-full h-16 shadow-md z-20">
-      <div className="container mx-auto h-full flex justify-between items-center p-2 lg:px-8">
+      <div className="container mx-auto h-full flex justify-between items-center px-4 lg:px-8">
         <Link to='/'>
           <img src="logo192.png" alt="" className="h-12 w-12" />
         </Link>
-        <form className="group group-hover:border-black flex-auto flex h-10 border-2 rounded-md items-center px-2 mx-4 md:mx-8 lg:mx-16">
-          <Icons.Search className="fill-stone-300 mr-4" />
-          <input type="text" id="search-box" placeholder="Search anything..." value={search} onChange={e => setSearch(e.target.value)} className="flex-auto outline-none text-stone-700" />
-        </form>
+        <div className="relative flex-auto mx-8">
+          <div className="absolute inset-y-0 left-2 flex items-center">
+            <Icons.Search className="fill-stone-300" />
+          </div>
+          <input
+            type="text"
+            id="search-box"
+            placeholder="Search anything..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full text-stone-700 pl-12 py-2 rounded-lg outline outline-2 outline-slate-200 focus:outline-teal-700"
+          />
+        </div>
         {
           windowWidth < 768
-            ? <NavBarMobile />
-            : <NavBar />
+            ? <MenuButton />
+            : <UserBar />
         }
 
       </div>
