@@ -5,6 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Carousel from "../components/Carousel";
 import Button from "../components/Button";
+import CourseCard from "../components/CourseCard";
 
 const Homepage = () => {
   const courses = [
@@ -60,18 +61,10 @@ const Homepage = () => {
           <div className="flex flex-wrap">
             {
               courses.map((course, i) => (
-                <div key={i} className="w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
-                  <div className="cursor-pointer mx-2 mb-4 shadow hover:shadow-lg ">
-                    <div style={{ 'padding-top': '56.25%' }} className="w-full relative overflow-hidden bg-slate-300">
-                      <img src="course-image.png" alt="" className="absolute inset-0 h-full" />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-xl font-bold line-clamp-2">{course.title}</h3>
-                      <p className="mb-4 font-semibold text-teal-700">{course.instructor}</p>
-                      <p className="text-right ">{course.students} students</p>
-                    </div>
-                  </div>
-                </div>
+                <CourseCard title={course.title} image={course.image}>
+                  <p className="mb-4 font-semibold text-teal-700">{course.instructor}</p>
+                  <p className="text-right ">{course.students} students</p>
+                </CourseCard>
               ))
             }
           </div>

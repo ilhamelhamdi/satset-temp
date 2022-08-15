@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
-import Icons from "../icons"
+import Icons from "../images/icons"
+import Images from "../images"
 import Button from "./Button"
 
 const AuthBar = () => {
@@ -21,7 +22,7 @@ const UserBar = () => {
   return (
     <div className="group h-full flex items-center justify-end relative">
       <div className="flex items-center space-x-2">
-        <img src="default-user.png" alt="" className="h-12" />
+        <img src={Images.DefaultUser} alt="" className="h-12" />
         <span>User</span>
         <Icons.Dropdown className="h-6" />
       </div>
@@ -60,7 +61,7 @@ const Header = () => {
     <header className="w-full h-16 shadow-md z-20">
       <div className="container mx-auto h-full flex justify-between items-center px-4 lg:px-8">
         <Link to='/'>
-          <img src="logo192.png" alt="" className="h-12 w-12" />
+          <img src={Images.Logo} alt="" className="h-12 w-12" />
         </Link>
         <div className="relative flex-auto mx-8">
           <div className="absolute inset-y-0 left-2 flex items-center">
