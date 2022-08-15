@@ -4,6 +4,9 @@ import Register from './pages/Register';
 import Homepage from './pages/Homepage';
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminProposal } from "./pages/AdminProposal";
+import StudentDashboard from './pages/StudentDashboard';
+import InstructorDashboard from './pages/InstructorDashboard';
+import CreateNewCourse from './pages/CreateNewCourse';
 
 
 function App() {
@@ -13,7 +16,10 @@ function App() {
         <Route path='/' element={<Homepage />} />
         <Route path='/register' element={<Register />} />
         <Route path='/dashboard' element={<AdminDashboard />} />
+        <Route path='/dashboard/student' element={<StudentDashboard />} />
+        <Route path='/dashboard/instructor' element={<InstructorDashboard />} />
         <Route path='/proposal' element={<AdminProposal />} />
+        <Route path='/create-course' element={<CreateNewCourse />} />
       </Routes>
     </BrowserRouter>
   )
