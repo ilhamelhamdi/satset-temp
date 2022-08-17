@@ -1,13 +1,23 @@
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import Button from "../components/Button"
 import CourseCard from "../components/CourseCard"
 import Header from "../components/Header"
 import MainLayout from "../components/MainLayout"
 import { SummaryCard } from "../components/SummaryCard"
+import { AuthContext } from "../context"
 import Icons from "../images/icons"
 
 const InstructorDashboard = () => {
+
+  // CHECK AUTHENTICATION
+  const { auth } = useContext(AuthContext)
+  useEffect(() => {
+    if (auth === null) navigate('/')
+  }, [])
+
   const [search, setSearch] = useState('')
+  const navigate = useNavigate()
 
   const summaryData = [
     {
@@ -56,6 +66,7 @@ const InstructorDashboard = () => {
     },
 
   ]
+
 
   return (
     <MainLayout>
