@@ -6,27 +6,29 @@ import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminProposal } from "./pages/AdminProposal";
 import StudentDashboard from './pages/StudentDashboard';
 import InstructorDashboard from './pages/InstructorDashboard';
-import {CourseDetail} from './pages/CourseDetail';
+import { CourseDetail } from './pages/CourseDetail';
 import { ViewQuiz } from "./pages/ViewQuiz";
-import {library} from '@fortawesome/fontawesome-svg-core'
-import {fas} from '@fortawesome/free-solid-svg-icons'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import AuthVerify from './components/AuthVerify';
 
 library.add(fas)
-
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Homepage />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/dashboard' element={<AdminDashboard />} />
-        <Route path='/dashboard/student' element={<StudentDashboard />} />
-        <Route path='/dashboard/instructor' element={<InstructorDashboard />} />
-        <Route path='/proposal' element={<AdminProposal />} />
-        <Route path='/course' element={<CourseDetail/>} />
-        <Route path='/quiz' element={<ViewQuiz/>}/>
-      </Routes>
+      <AuthVerify>
+        <Routes>
+          <Route path='/' element={<Homepage />} />
+          <Route path='/register' element={<Register />} />
+          <Route path='/dashboard' element={<AdminDashboard />} />
+          <Route path='/dashboard/student' element={<StudentDashboard />} />
+          <Route path='/dashboard/instructor' element={<InstructorDashboard />} />
+          <Route path='/proposal' element={<AdminProposal />} />
+          <Route path='/course' element={<CourseDetail />} />
+          <Route path='/quiz' element={<ViewQuiz />} />
+        </Routes>
+      </AuthVerify>
     </BrowserRouter>
   )
 }
