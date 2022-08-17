@@ -48,7 +48,7 @@ export const AdminProposal = () => {
                     </div>
                 </div>
             </div>
-            <div className="grid grid-cols-4 mt-5">
+            <div className="grid grid-cols-5 mt-5">
                 {
                     data ?
                         data.map((val, idx) => (
