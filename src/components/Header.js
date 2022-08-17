@@ -35,7 +35,7 @@ const UserBar = () => {
   return (
     <div className="group h-full flex items-center justify-end relative">
       <div className="flex items-center space-x-2">
-        <img src={Images.DefaultUser} alt="" className="h-12" />
+        <img src={auth.user.image} alt="pictures of you" className="w-10 h-10 rounded-full" />
         <span>{auth.user.name}</span>
         <Icons.Dropdown className="h-6" />
       </div>
