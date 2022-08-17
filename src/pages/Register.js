@@ -1,7 +1,8 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import { API_URL } from "../config"
 import { useNavigate } from 'react-router-dom'
 import { Loading } from "../components/Loading"
+import { AuthContext } from "../context"
 
 const Register = () => {
   const [image, setImage] = useState({preview: '', raw: ''})
@@ -15,6 +16,8 @@ const Register = () => {
   const [errorEmail, setErrorEmail] = useState(null)
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
+  const { setAuth } = useContext(AuthContext)
+  const tokenTTL = 6 * 3600 * 1000
 
   const handleImage = e => {
     if(e.target.files.length) {
@@ -54,24 +57,28 @@ const Register = () => {
     formData.role = role
     formData.image = imageUrl
 
-    fetch(API_URL + '/register', {
-      method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
+    try{
+      const res = await fetch(API_URL + '/register', {
+        method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        })
+      const user = (await res.json()).data
+      const accessToken = res.headers.get('Token')
+      setAuth({
+        user,
+        accessToken: {
+          value: accessToken,
+          exp: Date.now() + tokenTTL
+        }
       })
-        .then((res) => {
-          if(res.status === 200){
-            localStorage.setItem('accessToken', res.headers.get('Token'))
-            setIsLoading(false)
-            navigate('/')
-          }
-        })
-        .catch((error )=> {
-          console.log(error)
-          setIsLoading(false)
-        })
+    } catch (e) {
+      console.log(e)
+    } finally {
+      navigate('/')
+    }
   }
 
   const ImageUploadHandler = async () => {
