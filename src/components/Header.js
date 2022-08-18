@@ -35,7 +35,7 @@ const UserBar = () => {
   return (
     <div className="group h-full flex items-center justify-end relative">
       <div className="flex items-center space-x-2">
-        <img src={auth.user.image} alt="pictures of you" className="w-10 h-10 rounded-full" />
+        <img src={auth.user.image ? auth.user.image : Images.DefaultUser} alt="pictures of you" className="w-10 h-10 rounded-full" />
         <span>{auth.user.name}</span>
         <Icons.Dropdown className="h-6" />
       </div>
@@ -43,6 +43,14 @@ const UserBar = () => {
         <Link to={`/dashboard/${auth.user.role}`}>
           <span className="hover:text-teal-700 hover:underline inline-block w-full">Dashboard</span>
         </Link>
+        {
+          auth.user.role === 'admin' ?
+            <Link to={`/proposal/`}>
+              <span className="hover:text-teal-700 hover:underline inline-block w-full">Proposal</span>
+            </Link>
+          :
+            <></>
+        }
         <button onClick={handleLogout} className="hover:text-teal-700 hover:underline inline-block w-full text-left">Log out</button>
       </div>
     </div>
