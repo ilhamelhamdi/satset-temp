@@ -74,7 +74,7 @@ const Header = () => {
 
 
   return (
-    <header className="w-full h-16 shadow-md z-20">
+    <header className="w-full h-16 shadow-md bg-white z-30 fixed top-0">
       <div className="container mx-auto h-full flex justify-between items-center px-4 lg:px-8">
         <Link to='/'>
           <img src={Images.Logo} alt="" className="h-12 w-12" />
