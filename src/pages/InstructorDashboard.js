@@ -1,12 +1,16 @@
 import { useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import useSWR from "swr"
+
 import Button from "../components/Button"
 import CourseCard from "../components/CourseCard"
 import Header from "../components/Header"
 import MainLayout from "../components/MainLayout"
 import { SummaryCard } from "../components/SummaryCard"
+import { API_URL } from "../config"
 import { AuthContext } from "../context"
 import Icons from "../images/icons"
+
 
 const InstructorDashboard = () => {
 
@@ -16,8 +20,26 @@ const InstructorDashboard = () => {
     if (auth === null) navigate('/')
   }, [])
 
+  // FETCH DATA
+  const accessToken = JSON.parse(localStorage.getItem('auth')).accessToken.value
+  const fetchCourses = async (url) => {
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + accessToken
+      }
+    }
+    const res = await fetch(url, requestOptions)
+    return (await res.json()).data
+  }
+  const { data, error } = useSWR(`${API_URL}/instructor-dashboard`, fetchCourses)
+
   const [search, setSearch] = useState('')
   const navigate = useNavigate()
+
+  useEffect(() => {
+    console.log(data);
+  }, [data])
 
   const summaryData = [
     {
