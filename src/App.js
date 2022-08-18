@@ -11,6 +11,7 @@ import { ViewQuiz } from "./pages/ViewQuiz";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import AuthVerify from './components/AuthVerify';
+import CreateNewCourse from './pages/CreateNewCourse';
 
 library.add(fas)
 
@@ -27,6 +28,7 @@ function App() {
           <Route path='/proposal' element={<AdminProposal />} />
           <Route path='/course' element={<CourseDetail />} />
           <Route path='/quiz' element={<ViewQuiz />} />
+          <Route path='/create-course' element={<CreateNewCourse />} />
         </Routes>
       </AuthVerify>
     </BrowserRouter>
