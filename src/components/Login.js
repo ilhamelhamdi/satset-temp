@@ -11,8 +11,8 @@ const Login = ({ setShowLogin }) => {
 
   const { setAuth } = useContext(AuthContext)
 
-  const [email, setEmail] = useState('jacktheripper@gmail.com')
-  const [password, setPassword] = useState('jack123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleLogin = async () => {
