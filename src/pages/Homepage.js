@@ -32,7 +32,7 @@ const CoursesList = ({ index }) => {
   // Fetch success handler
   if (data) {
     return data.map(course => (
-      <CourseCard key={course.id} title={course.title} image={course.image}>
+      <CourseCard key={course.id} title={course.title} image={course.image} id={course.id}>
         <p className="mb-4 font-semibold text-teal-700">{course.instructor_name}</p>
         <p className="text-right ">{course.enrolled_student} students</p>
       </CourseCard>
