@@ -10,16 +10,27 @@ const LectureBox = () => {
   return (
     <div className="shadow-lg border-2 border-solid border-slate-200 p-4 mb-4 rounded-lg">
       <div className="flex justify-between">
-        <h2 className="text-2xl text-teal-700"> <em>Lecture</em> : <span className="font-bold">This is title</span></h2>
-        <Icons.Delete className="fill-rose-800 opacity-70 hover:opacity-100" />
-      </div>
-      <div id="link" className="pl-8">
-        <em>Link : </em>
-        <span>This is link</span>
+        <h2 className="text-2xl"> <em className="text-teal-700">Lecture</em> : <span className="font-bold">This is title</span></h2>
+        <div className="flex">
+          <Icons.Edit className="fill-teal-700 opacity-70 hover:opacity-100 h-8" />
+          <Icons.Delete className="fill-rose-800 opacity-70 hover:opacity-100 h-8" />
+        </div>
       </div>
     </div>
   )
 }
+
+const QuizBox = () => {
+  return (
+    <div className="shadow-lg border-2 border-solid border-slate-200 p-4 mb-4 rounded-lg">
+      <div className="flex justify-between">
+        <h2 className="text-2xl"> <em className="text-teal-700">Quiz</em> : <span className="font-bold">This is title</span></h2>
+        <Icons.Delete className="fill-rose-800 opacity-70 hover:opacity-100" />
+      </div>
+    </div>
+  )
+}
+
 
 const InputLecture = ({ setShowInputLecture }) => {
   const [title, setTitle] = useState('')
@@ -134,10 +145,13 @@ const CreateNewCourse = () => {
         <hr />
         <div>
           <h1 className="text-3xl font-bold my-4">Content</h1>
+
           <LectureBox />
+          <QuizBox />
+
           <div className="flex justify-end space-x-4">
             <Button onClick={() => setShowInputLecture(true)}>+ Add Lecture</Button>
-            <Button>+ Add Quiz</Button>
+            <Button onClick={() => setShowInputQuiz(true)}>+ Add Quiz</Button>
           </div>
         </div>
 
