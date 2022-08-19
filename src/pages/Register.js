@@ -3,6 +3,7 @@ import { API_URL } from "../config"
 import { useNavigate } from 'react-router-dom'
 import { Loading } from "../components/Loading"
 import { AuthContext } from "../context"
+import Toast from "../components/Toast"
 
 const Register = () => {
   const [image, setImage] = useState({preview: '', raw: ''})
@@ -65,19 +66,29 @@ const Register = () => {
           },
           body: JSON.stringify(formData)
         })
-      const user = (await res.json()).data
-      const accessToken = res.headers.get('Token')
-      setAuth({
-        user,
-        accessToken: {
-          value: accessToken,
-          exp: Date.now() + tokenTTL
+      if(res.status === 200) {
+        const user = (await res.json()).data
+        const accessToken = res.headers.get('Token')
+        if(role === 'student'){
+          setAuth({
+            user,
+            accessToken: {
+              value: accessToken,
+              exp: Date.now() + tokenTTL
+            }
+          })
+          Toast('success', 'Successfully registered!')
+          navigate('/')
+        } else {
+          Toast('info', 'Successfully registered! Wait approval from admin.')
         }
-      })
+      } else {
+        Toast('error', 'Email already registered')
+      }
     } catch (e) {
-      console.log(e)
+      Toast('error', e)
     } finally {
-      navigate('/')
+      setIsLoading(false)
     }
   }
 
@@ -96,7 +107,7 @@ const Register = () => {
         const json = await res.json()
         return json.data.link
       } catch(e){
-        console.log(e)
+        Toast('error', e)
         setIsLoading(false)
       }
     }

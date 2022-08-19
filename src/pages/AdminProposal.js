@@ -6,14 +6,16 @@ import SummaryCardSkeleton from "../components/SummaryCard/skeleton"
 import { API_URL } from "../config"
 import MainLayout from "../components/MainLayout";
 import Header from "../components/Header";
+import Toast from "../components/Toast";
+import Button from "../components/Button";
 
 export const AdminProposal = () => {
-    const [searchText, setSearchText] = useState('')
     const [data, setData] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
     const [type, setType] = useState('instructor')
     const [page, setPage] = useState(1)
     const { auth } = useContext(AuthContext)
+    const [nextLink, setNextLink] = useState('')
     const accessToken = JSON.parse(localStorage.getItem('auth')).accessToken.value
     const navigate = useNavigate()
 
@@ -23,7 +25,7 @@ export const AdminProposal = () => {
 
     useEffect(() => {
         fetchData('instructors', 1)
-          .then(data => setData(data.data))
+          .then(data => (setData(data.data), setNextLink(data.next)))
     }, []);
 
     const fetchData = async (type, page) => {
@@ -49,10 +51,11 @@ export const AdminProposal = () => {
     const changeData = val => {
         setType(val.slice(0,-1))
         fetchData(val, 1)
-          .then(data => setData(data.data))
+          .then(data => (setData(data.data), setNextLink(data.next)))
     }
 
-    const actionHandler = async (id, action) => {
+    const actionHandler = async (id, action, icon) => {
+        setIsLoading(true)
         const typeOfID = type === 'instructor' ? 'user_id' : 'course_id'
          try{
             const res = await fetch(API_URL + `/verify-${type}`, {
@@ -70,11 +73,12 @@ export const AdminProposal = () => {
             const json = await res.json()
             return json
         } catch(e) {
-            console.log(e)
+            Toast('error', e)
             throw(e)
         } finally {
             setData(data.filter(val => val.id !== id))
             setIsLoading(false)
+            Toast(icon, `Successfully ${action}`)
         }
     }
 
@@ -89,14 +93,6 @@ export const AdminProposal = () => {
                             <option value="instructors">Instructors</option>
                             <option value="courses">Courses</option>
                         </select>
-                        <div className="relative">
-                            <div className='flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none'>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M10 4C6.68629 4 4 6.68629 4 10C4 13.3137 6.68629 16 10 16C13.3137 16 16 13.3137 16 10C16 6.68629 13.3137 4 10 4ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 11.8487 17.3729 13.551 16.3199 14.9056L21.7071 20.2929C22.0976 20.6834 22.0976 21.3166 21.7071 21.7071C21.3166 22.0976 20.6834 22.0976 20.2929 21.7071L14.9056 16.3199C13.551 17.3729 11.8487 18 10 18C5.58172 18 2 14.4183 2 10Z" fill="#7D7D7D"/>
-                                </svg>
-                            </div>
-                            <input value={searchText} onChange={e => setSearchText(e.target.value)} type="text" placeholder="Search" className="w-full pl-12 py-3 rounded-xl bg-gray-200"/>
-                        </div>
                     </div>
                 </div>
                 <div className="grid lg:grid-cols-5 sm:grid-cols-2 mt-5 gap-x-2">
@@ -126,6 +122,12 @@ export const AdminProposal = () => {
                                 <h1 className="text-lg">No data avalaible</h1>
                     }
                 </div>
+                {
+                    !isLoading && nextLink &&
+                    <div className="flex justify-center">
+                        <Button onClick={() => setPage(page + 1)}>Load more...</Button>
+                    </div>
+                }
             </div>
         </MainLayout>
     )

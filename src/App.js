@@ -12,6 +12,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import AuthVerify from './components/AuthVerify';
 import CreateNewCourse from './pages/CreateNewCourse';
+import Unauthorized from './pages/Unauthorized';
 
 library.add(fas)
 
@@ -26,9 +27,11 @@ function App() {
           <Route path='/dashboard/student' element={<StudentDashboard />} />
           <Route path='/dashboard/instructor' element={<InstructorDashboard />} />
           <Route path='/proposal' element={<AdminProposal />} />
-          <Route path='/course' element={<CourseDetail />} />
+          <Route path='/course/:id' element={<CourseDetail />} />
           <Route path='/quiz' element={<ViewQuiz />} />
           <Route path='/create-course' element={<CreateNewCourse />} />
+          <Route path='/403' element={<Unauthorized/>} />
+          <Route path='/quiz/:id' element={<ViewQuiz/>} />
         </Routes>
       </AuthVerify>
     </BrowserRouter>
