@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
 import Button from "../components/Button"
@@ -147,6 +147,11 @@ const InstructorDashboard = () => {
 
         </div>
       </div>
+      <Link to='/create-course'>
+        <div className="fixed bottom-8 right-8 lg:bottom-16 lg:right-16 h-16 w-16 rounded-full bg-teal-700 flex justify-center items-center text-5xl text-white">
+          <span>+</span>
+        </div>
+      </Link>
     </MainLayout>
   )
 }
