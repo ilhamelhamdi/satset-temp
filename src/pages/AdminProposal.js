@@ -10,7 +10,7 @@ import Toast from "../components/Toast";
 import Button from "../components/Button";
 
 export const AdminProposal = () => {
-    const [data, setData] = useState(null)
+    const [dataProposal, setDataProposal] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [type, setType] = useState('instructor')
     const [page, setPage] = useState(1)
@@ -24,9 +24,9 @@ export const AdminProposal = () => {
     }, [])
 
     useEffect(() => {
-        fetchData('instructors', 1)
-          .then(data => (setData(data.data), setNextLink(data.next)))
-    }, []);
+        fetchData(type+'s', page)
+          .then(data => (setDataProposal([...dataProposal, ...data.data]), setNextLink(data.next)))
+    }, [page]);
 
     const fetchData = async (type, page) => {
         setIsLoading(true)
@@ -51,7 +51,7 @@ export const AdminProposal = () => {
     const changeData = val => {
         setType(val.slice(0,-1))
         fetchData(val, 1)
-          .then(data => (setData(data.data), setNextLink(data.next)))
+          .then(data => (setDataProposal(data.data), setNextLink(data.next)))
     }
 
     const actionHandler = async (id, action, icon) => {
@@ -76,7 +76,7 @@ export const AdminProposal = () => {
             Toast('error', e)
             throw(e)
         } finally {
-            setData(data.filter(val => val.id !== id))
+            setDataProposal(dataProposal.filter(val => val.id !== id))
             setIsLoading(false)
             Toast(icon, `Successfully ${action}`)
         }
@@ -110,8 +110,8 @@ export const AdminProposal = () => {
                                 </SummaryCardSkeleton>
                             ))
                         :
-                            data.length > 0 ?
-                                data.map((val, idx) => (
+                            dataProposal.length > 0 ?
+                                dataProposal.map((val, idx) => (
                                     <ProposalCard
                                         item={val}
                                         key={idx}
@@ -124,8 +124,8 @@ export const AdminProposal = () => {
                 </div>
                 {
                     !isLoading && nextLink &&
-                    <div className="flex justify-center">
-                        <Button onClick={() => setPage(page + 1)}>Load more...</Button>
+                    <div className="flex justify-center mb-5">
+                        <Button onClick={() => {fetchData(type+'s', page + 1); setPage(page+1)}}>Load more...</Button>
                     </div>
                 }
             </div>

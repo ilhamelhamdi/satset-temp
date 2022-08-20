@@ -22,13 +22,13 @@ export const DashboardData = () => {
                 'Authorization': 'Bearer ' + token
             }
         })
-        setDashboardData((await res.json()).data)
-        return dashboardData
+        const data = ((await res.json()).data)
+        return data
     }
 
     const { data, error } = useSWR([`${API_URL}/admin-dashboard`, accessToken], fetchData)
 
-    if(!dashboardData){
+    if(!data && !error){
         return (
             <div>
                 <div className="flex flex-row justify-between">
@@ -52,19 +52,19 @@ export const DashboardData = () => {
         )
     }
 
-    if(dashboardData){
+    if(data) {
         return (
             <div>
                 <div className="flex flex-row justify-between">
                     {
-                        dashboardData.data.map((val, i) => (
+                        data.data.map((val, i) => (
                             <SummaryCard key={i} item={val}/>
                         ))
                     }
                 </div>
-                <div className="flex justify-between mt-5 xl:flew-row">
-                    <NewUserChart data={dashboardData.new_user}/>
-                    <TopCourseChart top_courses={dashboardData.top_courses}/>
+                <div className="flex justify-between mt-5 flex-col lg:flex-row">
+                    <NewUserChart data={data.new_user}/>
+                    <TopCourseChart top_courses={data.top_courses}/>
                 </div>
             </div>
         )

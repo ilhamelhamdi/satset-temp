@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import MainLayout from "../components/MainLayout";
 import Header from "../components/Header"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,6 +7,8 @@ import useSWR from "swr";
 import { API_URL } from "../config"
 import { Loading } from "../components/Loading";
 import Toast from "../components/Toast";
+import Icons from "../images/icons"
+import Button from "../components/Button"
 
 const auth = JSON.parse(localStorage.getItem('auth'))
 const accessToken = auth ? auth.accessToken.value : ''
@@ -68,10 +70,11 @@ const ContentQuiz = ({ item, is_enrolled }) => {
 
 const CourseHeader = ({ item, is_enrolled, role }) => {
     const [showMoreDesc, setShowMoreDesc] = useState(false)
-    const [isEnrolled, setIsEnrolled] = useState(is_enrolled)
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
 
     const enrolledCourse = async () => {
+        setIsLoading(true)
         try {
             const res = await fetch(API_URL + '/enroll', {
                 method: "POST",
@@ -83,8 +86,9 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
             })
             console.log(res)
             if (res.status === 202) {
+                navigate(0)
                 Toast('success', 'Successfully enrolled the course')
-                setIsEnrolled(true)
+                // setIsEnrolled(true)
             } else {
                 Toast('error', 'Something wrong')
             }
@@ -96,10 +100,18 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
     return (
         <div className="grid lg:grid-cols-3 sm:grid-rows-1 mb-10">
             <div className="col-span-1 content-center">
-                <img src={item.image} className="border-2 col-span-1"/>
-                { !isEnrolled && role === 'student' &&
+                <img src={item.image} alt="courses" className="border-2 col-span-1"/>
+                { !is_enrolled && role === 'student' &&
                     <div className="flex justify-center mt-2">
-                        <button className="py-2 px-5 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => enrolledCourse()}>Enroll</button>
+                        {
+                            isLoading ?
+                                <Button className="cursor-not-allowed">
+                                    <Icons.Loading className="animate-spin h-5 w-5 mr-3 inline-block" />
+                                    Loading...
+                                </Button>
+                            : <button className="py-2 px-5 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => enrolledCourse()}>Enroll</button>
+                        }
+                        
                     </div>
                 }
                 {
@@ -181,7 +193,6 @@ const CourseContent = ({item, is_enrolled}) => {
 
 const CourseData = () => {
     const idOfCourse = (useParams()).id
-    const [isEnrolled, setIsEnrolled] = useState()
     const [order, setOrder] = useState()
     const navigate = useNavigate()
 
@@ -198,8 +209,7 @@ const CourseData = () => {
             navigate('/register')
         }
         const data = await res.json()
-        setIsEnrolled(data.is_enrolled)
-        return data.data
+        return data
     }
 
     const fetchOrder = async (url, token) => {
@@ -229,8 +239,8 @@ const CourseData = () => {
     if (data) {
         return (
             <div className="container mx-auto mt-10">
-                <CourseHeader item={data} is_enrolled={isEnrolled} role={userRole} />
-                <CourseContent item={data} is_enrolled={isEnrolled} />
+                <CourseHeader item={data.data} is_enrolled={data.is_enrolled} role={userRole} />
+                <CourseContent item={data.data} is_enrolled={data.is_enrolled} />
             </div>
         )
     }
