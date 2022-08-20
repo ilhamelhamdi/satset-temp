@@ -39,7 +39,7 @@ const ContentLecture = ({item, is_enrolled}) => {
             {   is_enrolled ?
                     <div className="flex justify-between w-full">
                         <a className="ml-2 text-blue-600" href={item.link} target="_blank">{item.title}</a>
-                        {isCompleted ? <button className="text-xs p-1 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => completeCourse(item.id)}>Mark as Complete</button>
+                        {!isCompleted ? <button className="text-xs p-1 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => completeCourse(item.id)}>Mark as Complete</button>
                         : <p className="text-xs text-teal-700">Completed</p>}
                     </div>
                 :
@@ -56,7 +56,7 @@ const ContentQuiz = ({ item, is_enrolled }) => {
             {   is_enrolled ?
                     <div className="flex justify-between w-full items-center">
                         <a className="ml-2 text-blue-600" href={`/quiz/${item.id}`}>{item.title}</a>
-                        <p className="text-xs text-teal-700">Score: {item.score}</p>
+                        { item.score >= 0 && <p className="text-xs text-teal-700">Score: {item.score}</p>}
                     </div>
                 :
                 <p className="ml-2">{item.title}</p>
@@ -190,6 +190,7 @@ const CourseData = () => {
             navigate('/register')
         }
         const data = await res.json()
+        setIsEnrolled(data.is_enrolled)
         return data.data
     }
 
