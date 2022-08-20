@@ -162,7 +162,6 @@ const CourseContent = ({item, is_enrolled, orders}) => {
                 <div className="px-5 pt-5">
                     {
                         orders.map((val, idx) => {
-                            console.log(val)
                             if(val === 'l'){
                                 const content = lectures[0]
                                 lectures.splice(0,1)
