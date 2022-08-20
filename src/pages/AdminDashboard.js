@@ -13,21 +13,6 @@ import ChartSkeleton from "../components/Chart/skeleton";
 
 
 export const DashboardData = () => {
-    const summaryData = [
-        {
-         "name": "students",
-         "amount": 110,
-        },
-        {
-         "name": "instructors",
-         "amount": 5,
-        },
-        {
-         "name": "courses",
-         "amount": 25,
-        },
-    ];
-
     const [dashboardData, setDashboardData] = useState()
     const accessToken = JSON.parse(localStorage.getItem('auth')).accessToken.value
 
