@@ -1,21 +1,44 @@
 import { useEffect, useState } from "react"
-import Icons from "../images/icons"
-import Button from "./Button"
-import ModalBox from "./ModalBox"
+import Icons from "../../images/icons"
+import Button from "../Button"
+import ModalBox from "../ModalBox"
 
 
-const InputQuizModal = ({ setShowInputQuiz }) => {
-  const [quiz, setQuiz] = useState(JSON.parse(localStorage.getItem('quiz')))
+const InputQuizModal = (props) => {
+  const [quiz, setQuiz] = useState(JSON.parse(localStorage.getItem('temp')))
   const [title, setTitle] = useState(quiz ? quiz.title : '')
-  const [questions, setQuestions] = useState(quiz ? quiz.questions : [{}])
+  const [questions, setQuestions] = useState(quiz ? quiz.questions : [{ questionId: 0 }])
   const [activeQuestion, setActiveQuestion] = useState()
+
+  const handleClose = () => {
+    localStorage.removeItem('temp')
+    props.setIndexEdit(-1)
+    props.setShowInputQuiz(false)
+  }
+
+  const handleSaveButton = () => {
+    const content = {
+      type: 'q',
+      data: quiz
+    }
+    if (props.indexEdit !== -1) {
+      const newContents = props.contents.map((val, idx) => {
+        if (idx === props.indexEdit) return content
+        return val
+      })
+      props.setContents(newContents)
+    } else {
+      props.setContents([...props.contents, { type: 'q', data: quiz }])
+    }
+    handleClose()
+  }
 
   const handleTitleUpdate = () => {
     setQuiz({ ...quiz, title })
   }
 
-  const saveOnLocal = () => {
-    localStorage.setItem('quiz', JSON.stringify(quiz))
+  const handleAddQuestion = () => {
+    setQuestions([...questions, { questionId: questions.length }])
   }
 
   useEffect(() => {
@@ -23,8 +46,7 @@ const InputQuizModal = ({ setShowInputQuiz }) => {
   }, [questions])
 
   useEffect(() => {
-    saveOnLocal()
-    console.log(quiz)
+    localStorage.setItem('temp', JSON.stringify(quiz))
   }, [quiz])
 
   return (
@@ -48,19 +70,19 @@ const InputQuizModal = ({ setShowInputQuiz }) => {
             if (activeQuestion === question.questionId) {
               return <InputQuestion key={idx} {...{ questions, setQuestions, idx, setActiveQuestion }} />
             }
-            return <NonInputQuestion key={idx} {...{ question, idx, setActiveQuestion }} />
+            return <NonInputQuestion key={idx} {...{ question, idx, activeQuestion, setActiveQuestion }} />
 
           })
         }
         </div>
-        <Button onClick={() => setQuestions([...questions, { questionId: questions.length }])}>+ Add Question</Button>
+        <Button onClick={handleAddQuestion}>+ Add Question</Button>
       </div>
 
       <div className="space-x-2 flex justify-end">
-        <Button onClick={() => { setShowInputQuiz(false) }} className="font-bold">Cancel</Button>
-        <Button className="font-bold">Save</Button>
+        <Button onClick={handleClose} className="font-bold">Cancel</Button>
+        <Button onClick={handleSaveButton} className="font-bold">Save</Button>
       </div>
-    </ModalBox>
+    </ModalBox >
   )
 }
 
@@ -126,17 +148,23 @@ const InputQuestion = ({ questions, setQuestions, idx, setActiveQuestion }) => {
       </div>
       <div className="space-x-4 flex justify-between">
         <Button onClick={handleAddOption}>+ Add Option</Button>
-        <Button onClick={handleSaveQuestion}>Save</Button>
+        <div className="space-x-2">
+          <Button onClick={() => setActiveQuestion()}>Cancel</Button>
+          <Button onClick={handleSaveQuestion}>Save</Button>
+        </div>
       </div>
     </div >
   )
 }
 
-const NonInputQuestion = ({ question, idx, setActiveQuestion }) => {
+const NonInputQuestion = ({ question, idx, activeQuestion, setActiveQuestion }) => {
+  const switchActiveQuestion = () => {
+    if (activeQuestion === undefined) setActiveQuestion(question.questionId)
+  }
   return (
     <div
-      onClick={() => setActiveQuestion(question.questionId)}
-      className="border rounded-lg w-full p-4 space-y-4 cursor-pointer"
+      onClick={switchActiveQuestion}
+      className="border rounded-lg w-full p-4 space-y-4"
     >
       <div className="w-full flex space-x-2">
         <span>{idx + 1}.</span>

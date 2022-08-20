@@ -1,88 +1,46 @@
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import Button from "../components/Button"
 import Header from "../components/Header"
-import InputQuizModal from "../components/InputQuizModal"
+import InputQuizModal from "../components/CreateCourse/InputQuizModal"
 import MainLayout from "../components/MainLayout"
-import ModalBox from "../components/ModalBox"
+import QuizBox from "../components/CreateCourse/QuizBox"
 import Icons from "../images/icons"
-
-const LectureBox = () => {
-  return (
-    <div className="shadow-lg border-2 border-solid border-slate-200 p-4 mb-4 rounded-lg">
-      <div className="flex justify-between">
-        <h2 className="text-2xl"> <em className="text-teal-700">Lecture</em> : <span className="font-bold">This is title</span></h2>
-        <div className="flex">
-          <Icons.Edit className="fill-teal-700 opacity-70 hover:opacity-100 h-8" />
-          <Icons.Delete className="fill-rose-800 opacity-70 hover:opacity-100 h-8" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const QuizBox = () => {
-  return (
-    <div className="shadow-lg border-2 border-solid border-slate-200 p-4 mb-4 rounded-lg">
-      <div className="flex justify-between">
-        <h2 className="text-2xl"> <em className="text-teal-700">Quiz</em> : <span className="font-bold">This is title</span></h2>
-        <Icons.Delete className="fill-rose-800 opacity-70 hover:opacity-100" />
-      </div>
-    </div>
-  )
-}
-
-
-const InputLecture = ({ setShowInputLecture }) => {
-  const [title, setTitle] = useState('')
-  const [link, setLink] = useState('')
-
-  return (
-    <ModalBox>
-      <h2 className="text-2xl text-teal-700 font-bold text-center">Lecture</h2>
-      <div id="title" className="mb-4">
-        <h2 className="text-lg  mb-2">Title</h2>
-        <input
-          type="text"
-          placeholder="Insert your lecture title"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          className="inline-block w-full outline outline-2 outline-slate-200 focus:outline-teal-700 px-4 py-2 rounded-lg"
-        />
-      </div>
-      <div id="link" className="mb-4">
-        <h2 className="text-lg  mb-2">Link</h2>
-        <input
-          type="text"
-          placeholder="Insert your lecture link"
-          value={link}
-          onChange={e => setLink(e.target.value)}
-          className="inline-block w-full outline outline-2 outline-slate-200 focus:outline-teal-700 px-4 py-2 rounded-lg"
-        />
-      </div>
-      <div className="space-x-2 flex justify-end">
-        <Button onClick={() => setShowInputLecture(false)} className="font-bold">Cancel</Button>
-        <Button className="font-bold">Save</Button>
-      </div>
-    </ModalBox>
-  )
-}
+import LectureBox from "../components/CreateCourse/LectureBox"
+import InputLectureModal from "../components/CreateCourse/InputLectureModal"
+import { API_URL } from "../config"
+import { AuthContext } from "../context"
+import { useNavigate } from "react-router-dom"
 
 
 const CreateNewCourse = () => {
+  // CHECK AUTHENTICATION
+  const { auth } = useContext(AuthContext)
+  useEffect(() => {
+    if (auth === null) navigate('/')
+  }, [])
+
   const MAX_TITLE = 70
   const MAX_DESC = 2000
-  const [title, setTitle] = useState('')
-  const [desc, setDesc] = useState('')
-  const [image, setImage] = useState({ preview: '', raw: '' })
+  const [courseProfile, setCourseProfile] = useState(JSON.parse(localStorage.getItem('course-profile')))
+  const [title, setTitle] = useState(courseProfile ? courseProfile.title : '')
+  const [desc, setDesc] = useState(courseProfile ? courseProfile.desc : '')
+  const [image, setImage] = useState(courseProfile ? courseProfile.image : { preview: '', raw: '' })
+  const [contents, setContents] = useState(JSON.parse(localStorage.getItem('contents')) || [])
   const [showInputLecture, setShowInputLecture] = useState(false)
-  const [showInputQuiz, setShowInputQuiz] = useState(true)
+  const [showInputQuiz, setShowInputQuiz] = useState(false)
+  const [indexEdit, setIndexEdit] = useState(-1)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const navigate = useNavigate()
 
   const handleImage = e => {
     if (e.target.files.length) {
-      setImage({
+      const data = {
         preview: URL.createObjectURL(e.target.files[0]),
         raw: e.target.files[0]
-      });
+      }
+      setImage(data)
+      setCourseProfile({ ...courseProfile, image: data })
     }
   }
 
@@ -92,6 +50,106 @@ const CreateNewCourse = () => {
   const validateDesc = (value) => {
     if (value.length <= MAX_DESC) setDesc(value)
   }
+
+  const imageUploadHandler = async () => {
+    if (image.raw !== '') {
+      const data = new FormData();
+      data.append('image', image.raw)
+      try {
+        const res = await fetch('https://api.imgur.com/3/image', {
+          method: "POST",
+          headers: {
+            'Authorization': 'Client-ID 35d873feaf37beb'
+          },
+          referrerPolicy: "no-referrer",
+          body: data
+        })
+        if (res.status !== 200) throw Error('Failed to upload image')
+        const json = await res.json()
+        return json.data.link
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    return 'https://i.imgur.com//teA8hQ0.png'
+  }
+
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true)
+      const lectures = []
+      const quizzes = []
+      const order = []
+
+      contents.forEach(content => {
+        if (content.type === 'l') {
+          order.push('l')
+          lectures.push(content.data)
+        }
+        if (content.type === 'q') {
+          order.push('q')
+          const questions = content.data.questions.map((val) => ({
+            opt_true: val.optTrue,
+            opt: val.options,
+            question: val.title
+          }))
+          quizzes.push({ title, questions })
+        }
+      })
+
+      const imageLink = await imageUploadHandler()
+
+      const requestBody = {
+        title,
+        description: desc,
+        image: await imageLink,
+        lectures,
+        quizzes,
+        order
+      }
+
+      console.log(requestBody);
+
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + auth.accessToken.value
+        },
+        body: JSON.stringify(requestBody)
+      }
+
+      const res = await fetch(`${API_URL}/course`, requestOptions)
+      const courseId = (await res.json()).course_id
+      console.log(courseId);
+
+      localStorage.removeItem('course-profile')
+      localStorage.removeItem('contents')
+
+      navigate('/course/' + courseId)
+    } catch (e) {
+      alert(e);
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    setCourseProfile({ title, desc, image })
+  }, [title, desc, image])
+
+  useEffect(() => {
+    localStorage.setItem('course-profile', JSON.stringify(courseProfile))
+  }, [courseProfile])
+
+  useEffect(() => {
+    localStorage.setItem('contents', JSON.stringify(contents))
+  }, [contents])
+
+  useEffect(() => {
+    localStorage.removeItem('temp')
+  }, [])
+
 
   return (
     <MainLayout>
@@ -112,7 +170,7 @@ const CreateNewCourse = () => {
             <p className="text-right text-slate-500">{title.length}/{MAX_TITLE}</p>
           </div>
 
-          <div id="title">
+          <div id="desc">
             <h2 className="text-xl font-bold text-teal-700 mb-2">Description</h2>
             <textarea
               type="text"
@@ -143,12 +201,15 @@ const CreateNewCourse = () => {
         </div>
 
         <hr />
-        <div>
+        <div className="mb-6">
           <h1 className="text-3xl font-bold my-4">Content</h1>
-
-          <LectureBox />
-          <QuizBox />
-
+          {
+            contents.map((content, idx) => {
+              if (content === undefined) return null
+              if (content.type === 'l') return <LectureBox key={idx} {...{ contents, setContents, setShowInputLecture, setIndexEdit, idx }} />
+              if (content.type === 'q') return <QuizBox key={idx} {...{ contents, setContents, setShowInputQuiz, setIndexEdit, idx }} />
+            })
+          }
           <div className="flex justify-end space-x-4">
             <Button onClick={() => setShowInputLecture(true)}>+ Add Lecture</Button>
             <Button onClick={() => setShowInputQuiz(true)}>+ Add Quiz</Button>
@@ -156,10 +217,17 @@ const CreateNewCourse = () => {
         </div>
 
 
+        {isLoading ?
+          <Button className="w-full bg-teal-700 text-white text-xl font-bold cursor-not-allowed">
+            <Icons.Loading className="animate-spin h-5 w-5 mr-3 inline-block" />
+            Loading...
+          </Button> :
+          <Button onClick={handleSubmit} className="w-full bg-teal-700 text-white text-xl font-bold">Submit</Button>
+        }
       </div>
 
-      {showInputLecture && <InputLecture {...{ setShowInputLecture }} />}
-      {showInputQuiz && <InputQuizModal {...{ setShowInputQuiz }} />}
+      {showInputLecture && <InputLectureModal {...{ setShowInputLecture, contents, setContents, indexEdit, setIndexEdit }} />}
+      {showInputQuiz && <InputQuizModal {...{ setShowInputQuiz, contents, setContents, indexEdit, setIndexEdit }} />}
 
     </MainLayout>
   )
