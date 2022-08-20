@@ -116,7 +116,7 @@ const Register = () => {
   }
 
   return (
-    <MainLayout>
+    <div>
       {
         isLoading ?
           <Loading/>
@@ -205,7 +205,7 @@ const Register = () => {
             </form>
           </div>
       }
-    </MainLayout>
+    </div>
   )
 }
 
