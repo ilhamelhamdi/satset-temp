@@ -21,20 +21,21 @@ const CoursesList = (props) => {
   if (!data) {
     return [1, 2, 3, 4, 5].map((i) => (
       <CourseCardSkeleton key={i}>
-        <div className="mb-6 h-4 bg-slate-300 w-1/3" />
-        <div className="mb-1 h-4 bg-slate-300 w-1/2 self-end" />
+        <div className="mb-5 h-4 bg-slate-300 w-1/3" />
+        <div className="mb-1 h-4 w-full bg-slate-300" />
+        <div className="mb-1 h-4 bg-slate-300 w-1/6 self-end" />
       </CourseCardSkeleton>
     ))
   }
 
   // Fetch success handler
   if (data) {
-    return data.map(course => {
+    return data.map((course) => {
       const status = (course.completed_content === course.total_content) ? 'Completed' : 'In Progress'
       if (props.status === 'All' || props.status === status) return (
         <CourseCard key={course.id} title={course.title} image={course.image} id={course.id}>
-          <p className="mb-4 font-semibold text-slate-500">{course.status}</p>
-          <div className="border-solid border border-teal-700 h-4">
+          <p className="mb-4 font-semibold text-slate-500">{course.instructor_name}</p>
+          <div className="border-solid border border-teal-700 h-4 rounded-full overflow-hidden">
             <div
               style={{ width: (course.completed_content / course.total_content * 100) + '%' }}
               className="bg-teal-700 h-full"
@@ -44,6 +45,7 @@ const CoursesList = (props) => {
             {course.completed_content}/{course.total_content}
           </div>
         </CourseCard>
+
       )
     })
   }
