@@ -99,10 +99,10 @@ const StudentDashboard = () => {
             {
               summaryData ?
                 <>
-                  <SummaryCard item={{ name: 'Created Course', amount: summaryData.created_course }} />
-                  <SummaryCard item={{ name: 'Verified Course', amount: summaryData.verified_course }} />
-                  <SummaryCard item={{ name: 'Pending Course', amount: summaryData.pending_course }} />
-                  <SummaryCard item={{ name: 'Rejected Course', amount: summaryData.rejected_course }} />
+                  <SummaryCard item={{ name: 'Enrolled Course', amount: summaryData.enrolled_course }} />
+                  <SummaryCard item={{ name: 'Completed Course', amount: summaryData.completed_course }} />
+                  <SummaryCard item={{ name: 'Completed Lecture', amount: summaryData.completed_lecture }} />
+                  <SummaryCard item={{ name: 'Completed Quiz', amount: summaryData.completed_quiz }} />
                 </>
                 :
                 <>
