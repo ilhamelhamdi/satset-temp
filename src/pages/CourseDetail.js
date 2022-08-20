@@ -11,6 +11,7 @@ import Toast from "../components/Toast";
 const auth = JSON.parse(localStorage.getItem('auth'))
 const accessToken = auth ? auth.accessToken.value : ''
 const userRole = auth ? auth.user.role : ''
+const instructorEmail = auth ? auth.user.email : ''
 
 const ContentLecture = ({item, is_enrolled}) => {
     const [isCompleted, setIsCompleted] = useState(item.is_completed)
@@ -68,6 +69,7 @@ const ContentQuiz = ({ item, is_enrolled }) => {
 const CourseHeader = ({ item, is_enrolled, role }) => {
     const [showMoreDesc, setShowMoreDesc] = useState(false)
     const [isEnrolled, setIsEnrolled] = useState(is_enrolled)
+    const navigate = useNavigate()
 
     const enrolledCourse = async () => {
         try {
@@ -98,6 +100,12 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
                 { !isEnrolled && role === 'student' &&
                     <div className="flex justify-center mt-2">
                         <button className="py-2 px-5 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => enrolledCourse()}>Enroll</button>
+                    </div>
+                }
+                {
+                    item.instructor.email === instructorEmail && 
+                    <div className="flex justify-center mt-2">
+                        <button className="py-2 px-5 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => navigate(`/edit-course/${item.id}`)}>Edit</button>
                     </div>
                 }
             </div>
