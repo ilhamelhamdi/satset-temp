@@ -8,14 +8,15 @@ import { API_URL } from "../config"
 import { Loading } from "../components/Loading";
 import Toast from "../components/Toast";
 
-const accessToken = JSON.parse(localStorage.getItem('auth')).accessToken.value
-const userRole = JSON.parse(localStorage.getItem('auth')).user.role
+const auth = JSON.parse(localStorage.getItem('auth'))
+const accessToken = auth ? auth.accessToken.value : ''
+const userRole = auth ? auth.user.role : ''
 
-const ContentLecture = ({item, is_enrolled}) => {
+const ContentLecture = ({ item, is_enrolled }) => {
     const [isEnrolled, setIsEnrolled] = useState(is_enrolled)
 
     const completeCourse = async (id) => {
-        try{
+        try {
             const res = await fetch(API_URL + `/progress/${id}`, {
                 method: 'POST',
                 headers: {
@@ -23,7 +24,7 @@ const ContentLecture = ({item, is_enrolled}) => {
                     'Authorization': 'Bearer ' + accessToken
                 }
             })
-            if(res.status === 202) {
+            if (res.status === 202) {
                 setIsEnrolled(true)
                 Toast('success', 'Successfuly Completed Lecture!')
             }
@@ -35,47 +36,47 @@ const ContentLecture = ({item, is_enrolled}) => {
     return (
         <div className="flex items-center py-1">
             <FontAwesomeIcon icon="fa-solid fa-circle-play" />
-            {   isEnrolled ?
-                    <div className="flex justify-between w-full">
-                        <a className="ml-2 text-blue-600" href={item.link} target="_blank">{item.title}</a>
-                        <button className="text-xs p-1 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => completeCourse(item.id)}>Mark as Complete</button>
-                    </div>
+            {isEnrolled ?
+                <div className="flex justify-between w-full">
+                    <a className="ml-2 text-blue-600" href={item.link} target="_blank" rel="noreferrer">{item.title}</a>
+                    <button className="text-xs p-1 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => completeCourse(item.id)}>Mark as Complete</button>
+                </div>
                 :
-                    <p className="ml-2">{item.title}</p>
+                <p className="ml-2">{item.title}</p>
             }
         </div>
     )
 }
 
-const ContentQuiz = ({item, is_enrolled}) => {
+const ContentQuiz = ({ item, is_enrolled }) => {
     return (
         <div className="flex items-center py-1">
             <FontAwesomeIcon icon="fa-solid fa-list-check" />
-            {   is_enrolled ?
-                    <div className="flex justify-between w-full items-center">
-                        <a className="ml-2 text-blue-600" href={`/quiz/${item.id}`}>{item.title}</a>
-                        <p className="text-xs text-teal-700">Score: {item.score}</p>
-                    </div>
+            {is_enrolled ?
+                <div className="flex justify-between w-full items-center">
+                    <a className="ml-2 text-blue-600" href={`/quiz/${item.id}`}>{item.title}</a>
+                    <p className="text-xs text-teal-700">Score: {item.score}</p>
+                </div>
                 :
-                    <p className="ml-2">{item.title}</p>
+                <p className="ml-2">{item.title}</p>
             }
         </div>
     )
 }
 
-const CourseHeader = ({item, is_enrolled, role}) => {
+const CourseHeader = ({ item, is_enrolled, role }) => {
     const [showMoreDesc, setShowMoreDesc] = useState(false)
     const [isEnrolled, setIsEnrolled] = useState(is_enrolled)
 
     const enrolledCourse = async () => {
-        try{
+        try {
             const res = await fetch(API_URL + '/enroll', {
                 method: "POST",
-                headers: { 'Authorization': 'Bearer ' + accessToken},
-                body: JSON.stringify({"course_id": item.id})
+                headers: { 'Authorization': 'Bearer ' + accessToken },
+                body: JSON.stringify({ "course_id": item.id })
             })
             console.log(res)
-            if(res.status === 202){
+            if (res.status === 202) {
                 Toast('success', 'Successfully enrolled the course')
                 setIsEnrolled(true)
             } else {
@@ -89,8 +90,8 @@ const CourseHeader = ({item, is_enrolled, role}) => {
     return (
         <div className="grid lg:grid-cols-3 sm:grid-rows-1 mb-10">
             <div className="col-span-1 content-center">
-                <img src={item.image} className="border-2 col-span-1"/>
-                { !isEnrolled && role === 'student' &&
+                <img src={item.image} className="border-2 col-span-1" />
+                {!isEnrolled && role === 'student' &&
                     <div className="flex justify-center mt-2">
                         <button className="py-2 px-5 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => enrolledCourse()}>Enroll</button>
                     </div>
@@ -116,7 +117,7 @@ const CourseHeader = ({item, is_enrolled, role}) => {
     )
 }
 
-const CourseContent = ({item, is_enrolled}) => {
+const CourseContent = ({ item, is_enrolled }) => {
     const [showContent, setShowContent] = useState(false)
 
     return (
@@ -127,21 +128,21 @@ const CourseContent = ({item, is_enrolled}) => {
                     {
                         showContent ?
                             <FontAwesomeIcon icon="fa-solid fa-angles-up" />
-                        :
+                            :
                             <FontAwesomeIcon icon="fa-solid fa-angles-down" />
                     }
                 </button>
             </div>
-            {   showContent &&
+            {showContent &&
                 <div className="px-5 pt-5">
-                    {   
+                    {
                         item.lectures.map((val, idx) => (
-                            <ContentLecture key={idx} item={val} is_enrolled={is_enrolled}/>
+                            <ContentLecture key={idx} item={val} is_enrolled={is_enrolled} />
                         ))
                     }
                     {
                         item.quizzes.map((val, idx) => (
-                            <ContentQuiz key={idx} item={val} is_enrolled={is_enrolled}/>
+                            <ContentQuiz key={idx} item={val} is_enrolled={is_enrolled} />
                         ))
                     }
                 </div>
@@ -162,9 +163,9 @@ const CourseData = () => {
                 'Authorization': 'Bearer ' + token
             }
         })
-        if(res.status === 403){
+        if (res.status === 403) {
             navigate('/403')
-        } else if(res.status === 401){
+        } else if (res.status === 401) {
             navigate('/register')
         }
         const data = await res.json()
@@ -174,17 +175,17 @@ const CourseData = () => {
 
     const { data, error } = useSWR([`${API_URL}/course/${idOfCourse}`, accessToken], fetchData)
 
-    if(!data && !error) {
+    if (!data && !error) {
         return (
-            <Loading/>
+            <Loading />
         )
     }
 
     if (data) {
         return (
             <div className="container mx-auto mt-10">
-                <CourseHeader item={data} is_enrolled={isEnrolled} role={userRole}/>
-                <CourseContent item={data} is_enrolled={isEnrolled}/>
+                <CourseHeader item={data} is_enrolled={isEnrolled} role={userRole} />
+                <CourseContent item={data} is_enrolled={isEnrolled} />
             </div>
         )
     }
@@ -193,8 +194,8 @@ const CourseData = () => {
 export const CourseDetail = () => {
     return (
         <MainLayout>
-            <Header/>
-            <CourseData/>
+            <Header />
+            <CourseData />
         </MainLayout>
     )
 }
