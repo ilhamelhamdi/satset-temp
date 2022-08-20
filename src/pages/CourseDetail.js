@@ -17,7 +17,7 @@ const instructorEmail = auth ? auth.user.email : ''
 
 const ContentLecture = ({item, is_enrolled}) => {
     const [isCompleted, setIsCompleted] = useState(item.is_completed)
-
+    
     const completeCourse = async (id) => {
         try {
             const res = await fetch(API_URL + `/progress/${id}`, {
@@ -26,7 +26,6 @@ const ContentLecture = ({item, is_enrolled}) => {
                     'Authorization': 'Bearer ' + accessToken
                 }
             })
-            console.log(accessToken)
             if (res.status === 202) {
                 setIsCompleted(true)
                 Toast('success', 'Successfuly Completed Lecture!')
@@ -39,9 +38,9 @@ const ContentLecture = ({item, is_enrolled}) => {
     return (
         <div className="flex items-center py-1">
             <FontAwesomeIcon icon="fa-solid fa-circle-play" />
-            {   is_enrolled ?
+            {   is_enrolled || userRole === 'admin' ?
                     <div className="flex justify-between w-full">
-                        <a className="ml-2 text-blue-600" href={item.link} target="_blank">{item.title}</a>
+                        <a className="ml-2 text-blue-600" href={item.link} target="_blank" rel="noreferrer" >{item.title}</a>
                         {!isCompleted ? <button className="text-xs p-1 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => completeCourse(item.id)}>Mark as Complete</button>
                         : <p className="text-xs text-teal-700">Completed</p>}
                     </div>
@@ -56,7 +55,7 @@ const ContentQuiz = ({ item, is_enrolled }) => {
     return (
         <div className="flex items-center py-1">
             <FontAwesomeIcon icon="fa-solid fa-list-check" />
-            {   is_enrolled ?
+            {   is_enrolled || userRole === 'admin' ?
                     <div className="flex justify-between w-full items-center">
                         <a className="ml-2 text-blue-600" href={`/quiz/${item.id}`}>{item.title}</a>
                         { item.score >= 0 && <p className="text-xs text-teal-700">Score: {item.score}</p>}
@@ -84,11 +83,9 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
                 },
                 body: JSON.stringify({ "course_id": item.id })
             })
-            console.log(res)
             if (res.status === 202) {
                 navigate(0)
                 Toast('success', 'Successfully enrolled the course')
-                // setIsEnrolled(true)
             } else {
                 Toast('error', 'Something wrong')
             }
@@ -125,7 +122,6 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
                 <h1 className="font-bold text-3xl">{item.title}</h1>
                 <div className="flex justify-between items-center mb-2">
                     <h1 className="font-semibold text-lg">Instructor: {item.instructor.name}</h1>
-                    {/* <h1 className="text-sm text-gray-500">{item.updated_at.slice(0,10)}</h1> */}
                 </div>
                 <h1 className="font-semibold italic">Description</h1>
                 <p>
@@ -133,7 +129,6 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
                         item.description &&
                         (showMoreDesc ? item.description : item.description.substring(0, 630) + '...')
                     }
-                    {/* { showMoreDesc ? item.description : item.description.substring(0, 630) + '...'} */}
                     {   item.description && (item.description.length > 630 &&
                         <button className="text-blue-400 font-semibold ml-1" onClick={() => setShowMoreDesc(!showMoreDesc)}>
                             { showMoreDesc ? 'Show Less' : 'Show More'}
@@ -145,10 +140,10 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
     )
 }
 
-const CourseContent = ({item, is_enrolled}) => {
+const CourseContent = ({item, is_enrolled, orders}) => {
     const [showContent, setShowContent] = useState(false)
-    let idxLectures = 0
-    let idxQuizzes = 0
+    const lectures = [...item.lectures]
+    const quizzes = [...item.quizzes]
 
     return (
         <div className="rounded-xl shadow-md bg-white border-2 p-5">
@@ -165,25 +160,20 @@ const CourseContent = ({item, is_enrolled}) => {
             </div>
             {showContent &&
                 <div className="px-5 pt-5">
-                    {/* {
-                        order.map((val, idx) => {
+                    {
+                        orders.map((val, idx) => {
+                            console.log(val)
                             if(val === 'l'){
-                                <ContentLecture key={idx} item={item.lectures[idxLectures]} is_enrolled={is_enrolled}/>
-                                idxLectures++
+                                const content = lectures[0]
+                                lectures.splice(0,1)
+                                return <ContentLecture key={idx} item={content} is_enrolled={is_enrolled}/>
+                                
                             } else if(val === 'q'){
-                                <ContentQuiz key={idx} item={item.quizzes[idxQuizzes]} is_enrolled={is_enrolled}/>
+                                const content = quizzes[0]
+                                quizzes.splice(0,1)
+                                return <ContentQuiz key={idx} item={content} is_enrolled={is_enrolled}/>
                             }
                         })
-                    } */}
-                    {   
-                        item.lectures.map((val, idx) => (
-                            <ContentLecture key={idx} item={val} is_enrolled={is_enrolled} />
-                        ))
-                    }
-                    {
-                        item.quizzes.map((val, idx) => (
-                            <ContentQuiz key={idx} item={val} is_enrolled={is_enrolled} />
-                        ))
                     }
                 </div>
             }
@@ -193,7 +183,6 @@ const CourseContent = ({item, is_enrolled}) => {
 
 const CourseData = () => {
     const idOfCourse = (useParams()).id
-    const [order, setOrder] = useState()
     const navigate = useNavigate()
 
     const fetchData = async (url, token) => {
@@ -219,28 +208,24 @@ const CourseData = () => {
                 'Authorization': 'Bearer ' + token
             }
         })
-        if(res.status === 403){
-            navigate('/403')
-        } else if(res.status === 401){
-            navigate('/register')
-        }
-        const data = await res.json()
-        return data.order
+        const order = (await res.json()).order
+        return order
     }
 
-    const { data, error } = useSWR([`${API_URL}/course/${idOfCourse}`, accessToken], fetchData)
+    const { data } = useSWR([`${API_URL}/course/${idOfCourse}`, accessToken], fetchData)
+    const { data: order } = useSWR([`${API_URL}/course-order/${idOfCourse}`, accessToken], fetchOrder)
 
-    if(!data && !error) {
+    if(!data || !order) {
         return (
             <Loading />
         )
     }
 
-    if (data) {
+    if (data && order) {
         return (
             <div className="container mx-auto mt-10">
                 <CourseHeader item={data.data} is_enrolled={data.is_enrolled} role={userRole} />
-                <CourseContent item={data.data} is_enrolled={data.is_enrolled} />
+                <CourseContent item={data.data} is_enrolled={data.is_enrolled} orders={order}/>
             </div>
         )
     }

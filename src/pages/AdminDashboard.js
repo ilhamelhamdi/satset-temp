@@ -1,8 +1,8 @@
-import React, {useState, useEffect, useContext} from "react";
+import React, {useEffect, useContext} from "react";
 import { useNavigate } from "react-router-dom"
-import {SummaryCard} from '../components/SummaryCard'
-import {NewUserChart} from '../components/NewUserChart'
-import {TopCourseChart} from "../components/TopCourseChart";
+import {SummaryCard} from '../components/SummaryCard/SummaryCard'
+import {NewUserChart} from '../components/Chart/NewUserChart'
+import {TopCourseChart} from "../components/Chart/TopCourseChart";
 import MainLayout from "../components/MainLayout";
 import Header from "../components/Header"
 import { API_URL } from "../config"
@@ -13,7 +13,6 @@ import ChartSkeleton from "../components/Chart/skeleton";
 
 
 export const DashboardData = () => {
-    const [dashboardData, setDashboardData] = useState()
     const accessToken = JSON.parse(localStorage.getItem('auth')).accessToken.value
 
     const fetchData = async (url, token) => {
