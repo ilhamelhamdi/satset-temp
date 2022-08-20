@@ -7,11 +7,12 @@ import Toast from "../Toast"
 
 const QuizBox = (props) => {
   const { auth } = useContext(AuthContext)
-  const content = props.contents[props.idx].data
+  const content = props.contents[props.idx]
   const courseId = (useParams()).id
+  const quizId = content.data.id
 
   const handleFetch = async () => {
-    const res = await fetch(`${API_URL}/quiz/${content.id}`, {
+    const res = await fetch(`${API_URL}/quiz/${quizId}`, {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + auth.accessToken.value
@@ -22,7 +23,6 @@ const QuizBox = (props) => {
   }
 
   const handleDeleteAPI = async () => {
-    const quizId = content.id
     const resDelete = await fetch(`${API_URL}/quiz/${quizId}`, {
       method: 'DELETE',
       headers: {
@@ -32,7 +32,6 @@ const QuizBox = (props) => {
 
     // UPDATE Course Content Order
     const order = props.contents.map(content => (content.type))
-    console.log(order);
     order.splice(props.idx, 1)
     const resOrder = await fetch(`${API_URL}/course-order/${courseId}`, {
       method: 'PUT',
@@ -63,7 +62,7 @@ const QuizBox = (props) => {
   return (
     <div className="shadow-lg border-2 border-solid border-slate-200 p-4 mb-4 rounded-lg">
       <div className="flex justify-between">
-        <h2 className="text-2xl"> <em className="text-teal-700">Quiz</em> : <span className="font-bold">{content.title}</span></h2>
+        <h2 className="text-2xl"> <em className="text-teal-700">Quiz</em> : <span className="font-bold">{content.data.title}</span></h2>
         <div className="flex">
           <Icons.Edit onClick={handleEdit} className="fill-teal-700 opacity-70 hover:opacity-100 h-8 cursor-pointer" />
           <Icons.Delete onClick={handleDelete} className="fill-rose-800 opacity-70 hover:opacity-100 h-8 cursor-pointer" />

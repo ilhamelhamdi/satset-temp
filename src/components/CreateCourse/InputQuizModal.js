@@ -37,6 +37,7 @@ const InputQuizModal = (props) => {
         },
         body: JSON.stringify(quiz)
       })
+      console.log(quiz);
 
       // Modify Content Order
       const order = props.contents.map(content => (content.type))
@@ -73,17 +74,18 @@ const InputQuizModal = (props) => {
         })
       })
       if (res.status === 202) Toast('success', 'Successfully Modified Quiz')
+      else Toast('error', 'Failed to modify quiz')
     } catch (e) {
       console.log(e);
     }
   }
 
-  const handleSaveButton = () => {
+  const handleSaveButton = async () => {
     setIsLoading(true)
 
     if (courseId !== undefined) {
-      if (quiz.id !== undefined) handleModifyQuiz(quiz.id)
-      else handleAddQuiz(courseId)
+      if (quiz.id !== undefined) await handleModifyQuiz(quiz.id)
+      else await handleAddQuiz(courseId)
     }
 
     const content = {
@@ -137,7 +139,7 @@ const InputQuizModal = (props) => {
         <div className="space-y-4 mb-4">{
           questions.map((question, idx) => {
             if (activeQuestion === question.id) {
-              return <InputQuestion key={idx} {...{ questions, setQuestions, idx, setActiveQuestion }} />
+              return <InputQuestion key={idx} {...{ questions, setQuestions, idx, setActiveQuestion, quizId: quiz.id }} />
             }
             return <NonInputQuestion key={idx} {...{ question, idx, activeQuestion, setActiveQuestion }} />
 
@@ -164,26 +166,89 @@ const InputQuizModal = (props) => {
   )
 }
 
-const InputQuestion = ({ questions, setQuestions, idx, setActiveQuestion }) => {
-  const [opt, setOpt] = useState(questions[idx].opt || [''])
-  const [opt_true, setOptTrue] = useState(questions[idx].opt_true)
-  const [question, setQuestion] = useState({
-    id: questions[idx].id || idx,
-    question: questions[idx].question || '',
-    opt: questions[idx].opt || opt,
-    opt_true: questions[idx].opt_true || opt_true
-  })
+const InputQuestion = ({ questions, setQuestions, idx, setActiveQuestion, quizId }) => {
+  const { auth } = useContext(AuthContext)
+  const courseId = (useParams()).id
+  const [question, setQuestion] = useState(questions[idx])
+  const [opt, setOpt] = useState(question.opt || [''])
+  const [opt_true, setOptTrue] = useState(question.opt_true)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSaveQuestion = () => {
+  const handleModifyQuestion = async (questionId) => {
+    try {
+      const res = await fetch(`${API_URL}/question/${questionId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + auth.accessToken.value,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          question: question.question,
+          opt: question.opt,
+          opt_true: question.opt_true
+        })
+      })
+      if (res.status === 202) Toast('success', 'Successfully Modified Question')
+      else Toast('error', 'Failed to modify question')
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const handleAddQuestion = async (quizId) => {
+    try {
+      const res = await fetch(`${API_URL}/quiz/${quizId}/question`, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + auth.accessToken.value,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          question: question.question,
+          opt: question.opt,
+          opt_true: question.opt_true
+        })
+      })
+      if (res.status === 200) Toast('success', 'Successfully Added Question')
+      const questionId = (await res.json()).question_id
+      setQuestion({ ...question, id: questionId })
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const handleSaveQuestion = async () => {
+    setIsLoading(true)
+    if (courseId !== undefined && quizId) {
+      if (question.id >= 0) await handleModifyQuestion(question.id)
+      else await handleAddQuestion(quizId)
+    }
     const newQuestions = questions.map((val, i) => {
       if (i === idx) return question
       return val
     })
     setQuestions(newQuestions)
+    setIsLoading(false)
     setActiveQuestion()
   }
 
+  const handleDeleteQuestionAPI = async () => {
+    const res = await fetch(`${API_URL}/quiz/${quizId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + auth.accessToken.value,
+        'Content-Type': 'application/json'
+      }
+    })
+    if (res.status === 202) Toast('success', 'Successfully Deleted Question')
+    else Toast('error', 'Failed to delete question')
+  }
+
   const handleRemoveQuestion = () => {
+    if (courseId !== undefined && question.id >= 0) {
+      handleDeleteQuestionAPI(question.id)
+    }
+
     const newQuestions = [...questions]
     newQuestions.splice(idx, 1)
     setQuestions(newQuestions)
@@ -227,8 +292,17 @@ const InputQuestion = ({ questions, setQuestions, idx, setActiveQuestion }) => {
       <div className="space-x-4 flex justify-between">
         <Button onClick={handleAddOption}>+ Add Option</Button>
         <div className="space-x-2">
-          <Button onClick={() => setActiveQuestion()}>Cancel</Button>
-          <Button onClick={handleSaveQuestion}>Save</Button>
+          {
+            isLoading ?
+              <Button className="cursor-not-allowed">
+                <Icons.Loading className="animate-spin h-5 w-5 mr-3 inline-block" />
+                Loading...
+              </Button> :
+              <>
+                <Button onClick={() => setActiveQuestion()}>Cancel</Button>
+                <Button onClick={handleSaveQuestion}>Save</Button>
+              </>
+          }
         </div>
       </div>
     </div >

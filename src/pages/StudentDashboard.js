@@ -49,6 +49,9 @@ const CoursesList = (props) => {
       )
     })
   }
+  if (error) {
+    console.log(error);
+  }
 
 }
 
@@ -68,6 +71,7 @@ const StudentDashboard = () => {
       }
     }
     const res = await fetch(url, requestOptions)
+    if (res.status === 403) navigate('/403', { replace: true })
     return (await res.json()).data
   }
 
