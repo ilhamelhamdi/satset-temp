@@ -1,15 +1,60 @@
+import { useContext } from "react"
+import { useParams } from "react-router-dom"
+import { API_URL } from "../../config"
+import { AuthContext } from "../../context"
 import Icons from "../../images/icons"
+import Toast from "../Toast"
 
 const QuizBox = (props) => {
-  const content = props.contents[props.idx]
+  const { auth } = useContext(AuthContext)
+  const content = props.contents[props.idx].data
+  const courseId = (useParams()).id
 
-  const handleEdit = () => {
-    localStorage.setItem('temp', JSON.stringify(content.data))
+  const handleFetch = async () => {
+    const res = await fetch(`${API_URL}/quiz/${content.id}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + auth.accessToken.value
+      }
+    })
+    const data = await res.json()
+    return data.data
+  }
+
+  const handleDeleteAPI = async () => {
+    const quizId = content.id
+    const resDelete = await fetch(`${API_URL}/quiz/${quizId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'Bearer ' + auth.accessToken.value
+      },
+    })
+
+    // UPDATE Course Content Order
+    const order = props.contents.map(content => (content.type))
+    console.log(order);
+    order.splice(props.idx, 1)
+    const resOrder = await fetch(`${API_URL}/course-order/${courseId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + auth.accessToken.value,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ order })
+    })
+    if (resDelete.status === 202 && resOrder.status === 200) Toast('success', 'Successfully deleted lecture')
+    else Toast('error', 'Something wrong')
+  }
+
+  const handleEdit = async () => {
+    const quiz = (courseId === undefined) ? content : await handleFetch()
+    localStorage.setItem('temp', JSON.stringify(quiz))
     props.setShowInputQuiz(true)
     props.setIndexEdit(props.idx)
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    if (courseId !== undefined) await handleDeleteAPI()
     const newContents = [...props.contents]
     newContents.splice(props.idx, 1)
     props.setContents(newContents)
@@ -18,7 +63,7 @@ const QuizBox = (props) => {
   return (
     <div className="shadow-lg border-2 border-solid border-slate-200 p-4 mb-4 rounded-lg">
       <div className="flex justify-between">
-        <h2 className="text-2xl"> <em className="text-teal-700">Quiz</em> : <span className="font-bold">{content.data.title}</span></h2>
+        <h2 className="text-2xl"> <em className="text-teal-700">Quiz</em> : <span className="font-bold">{content.title}</span></h2>
         <div className="flex">
           <Icons.Edit onClick={handleEdit} className="fill-teal-700 opacity-70 hover:opacity-100 h-8 cursor-pointer" />
           <Icons.Delete onClick={handleDelete} className="fill-rose-800 opacity-70 hover:opacity-100 h-8 cursor-pointer" />

@@ -10,6 +10,7 @@ import InputLectureModal from "../components/CreateCourse/InputLectureModal"
 import { API_URL } from "../config"
 import { AuthContext } from "../context"
 import { useNavigate } from "react-router-dom"
+import Toast from "../components/Toast"
 
 
 const CreateNewCourse = () => {
@@ -17,6 +18,7 @@ const CreateNewCourse = () => {
   const { auth } = useContext(AuthContext)
   useEffect(() => {
     if (auth === null) navigate('/')
+    if (auth.user.role !== 'instructor') navigate('/403', { replace: true })
   }, [])
 
   const MAX_TITLE = 70
@@ -108,8 +110,6 @@ const CreateNewCourse = () => {
         order
       }
 
-      console.log(requestBody);
-
       const requestOptions = {
         method: 'POST',
         headers: {
@@ -120,15 +120,17 @@ const CreateNewCourse = () => {
       }
 
       const res = await fetch(`${API_URL}/course`, requestOptions)
+      if (res.status === 200) Toast('success', 'Successfuly Created Course')
+      else Toast('error', 'Something wrong')
+
       const courseId = (await res.json()).course_id
-      console.log(courseId);
 
       localStorage.removeItem('course-profile')
       localStorage.removeItem('contents')
 
       navigate('/course/' + courseId)
     } catch (e) {
-      alert(e);
+      Toast('error', e)
     } finally {
       setIsLoading(false)
     }
