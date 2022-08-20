@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { API_URL } from "../config"
 import { AuthContext } from "../context"
 import Icons from "../images/icons"
@@ -18,15 +18,6 @@ const Login = ({ setShowLogin }) => {
   const handleLogin = async () => {
     setIsLoading(true)
     try {
-      // FETCH TEST
-      // const requestOptions = {
-      //   method: 'GET',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // }
-      // const res = await fetch(`${API_URL}/courses/1`, requestOptions)
-
       // Post Data and Fetch Token
       const requestBody = { email, password }
       const requestOptions = {
@@ -56,6 +47,7 @@ const Login = ({ setShowLogin }) => {
       setShowLogin(false)
     }
   }
+
 
   return (
     <ModalBox>
