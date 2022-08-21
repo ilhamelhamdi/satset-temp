@@ -57,6 +57,7 @@ const InstructorDashboard = () => {
       }
     }
     const res = await fetch(url, requestOptions)
+    if (res.status === 403) navigate('/403')
     return (await res.json()).data
   }
 
@@ -67,7 +68,6 @@ const InstructorDashboard = () => {
   const [courseStatus, setCourseStatus] = useState('All')
 
   const navigate = useNavigate()
-
 
   let courses = []
   for (let i = 0; i < pageIndex; i++) {

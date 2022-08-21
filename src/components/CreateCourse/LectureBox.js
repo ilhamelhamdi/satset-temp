@@ -1,14 +1,21 @@
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { useParams } from "react-router-dom"
 import { API_URL } from "../../config"
 import { AuthContext } from "../../context"
 import Icons from "../../images/icons"
 import Toast from "../Toast"
 
+const Loading = () => (
+  <Icons.Loading className="fill-sky-500 h-8 cursor-wait animate-spin" />
+)
+
 const LectureBox = (props) => {
   const { auth } = useContext(AuthContext)
   const courseId = (useParams()).id
   const content = props.contents[props.idx]
+
+  const [loadingDelete, setLoadingDelete] = useState(false)
+
   const handleEdit = () => {
     localStorage.setItem('temp', JSON.stringify(content.data))
     props.setShowInputLecture(true)
@@ -36,12 +43,19 @@ const LectureBox = (props) => {
       },
       body: JSON.stringify({ order })
     })
-    if (resDelete.status === 202 && resOrder.status === 200) Toast('success', 'Successfully deleted lecture')
-    else Toast('error', 'Something wrong')
+    if (resDelete.status === 202 && resOrder.status === 200) return true
+    else return false
   }
 
   const handleDelete = async () => {
-    if (courseId !== undefined) await handleDeleteAPI()
+    setLoadingDelete(true)
+    let isSuccess = true
+    if (courseId !== undefined) isSuccess = await handleDeleteAPI()
+    if (!isSuccess) {
+      Toast('error', 'Somethin wrong')
+      return
+    }
+    Toast('success', 'Successfully Deleted Quiz')
     const newContents = [...props.contents]
     newContents.splice(props.idx, 1)
     props.setContents(newContents)
@@ -55,7 +69,11 @@ const LectureBox = (props) => {
         </h2>
         <div className="flex">
           <Icons.Edit onClick={handleEdit} className="fill-teal-700 opacity-70 hover:opacity-100 h-8 cursor-pointer" />
-          <Icons.Delete onClick={handleDelete} className="fill-rose-800 opacity-70 hover:opacity-100 h-8 cursor-pointer" />
+          {
+            loadingDelete ?
+              <Loading /> :
+              <Icons.Delete onClick={handleDelete} className="fill-rose-800 opacity-70 hover:opacity-100 h-8 cursor-pointer" />
+          }
         </div>
       </div>
     </div>

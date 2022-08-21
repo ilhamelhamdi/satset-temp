@@ -91,9 +91,9 @@ const CreateNewCourse = () => {
         if (content.type === 'q') {
           order.push('q')
           const questions = content.data.questions.map((val) => ({
-            opt_true: val.optTrue,
-            opt: val.options,
-            question: val.title
+            opt_true: val.opt_true,
+            opt: val.opt,
+            question: val.question
           }))
           quizzes.push({ title, questions })
         }

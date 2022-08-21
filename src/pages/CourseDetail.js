@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import MainLayout from "../components/MainLayout";
 import Header from "../components/Header"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,9 +15,9 @@ const accessToken = auth ? auth.accessToken.value : ''
 const userRole = auth ? auth.user.role : ''
 const instructorEmail = auth ? auth.user.email : ''
 
-const ContentLecture = ({item, is_enrolled}) => {
+const ContentLecture = ({ item, is_enrolled }) => {
     const [isCompleted, setIsCompleted] = useState(item.is_completed)
-    
+
     const completeCourse = async (id) => {
         try {
             const res = await fetch(API_URL + `/progress/${id}`, {
@@ -38,12 +38,12 @@ const ContentLecture = ({item, is_enrolled}) => {
     return (
         <div className="flex items-center py-1">
             <FontAwesomeIcon icon="fa-solid fa-circle-play" />
-            {   is_enrolled || userRole === 'admin' ?
-                    <div className="flex justify-between w-full">
-                        <a className="ml-2 text-blue-600" href={item.link} target="_blank" rel="noreferrer" >{item.title}</a>
-                        {!isCompleted ? <button className="text-xs p-1 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => completeCourse(item.id)}>Mark as Complete</button>
+            {is_enrolled || userRole === 'admin' ?
+                <div className="flex justify-between w-full">
+                    <a className="ml-2 text-blue-600" href={item.link} target="_blank" rel="noreferrer" >{item.title}</a>
+                    {!isCompleted ? <button className="text-xs p-1 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => completeCourse(item.id)}>Mark as Complete</button>
                         : <p className="text-xs text-teal-700">Completed</p>}
-                    </div>
+                </div>
                 :
                 <p className="ml-2">{item.title}</p>
             }
@@ -55,11 +55,11 @@ const ContentQuiz = ({ item, is_enrolled }) => {
     return (
         <div className="flex items-center py-1">
             <FontAwesomeIcon icon="fa-solid fa-list-check" />
-            {   is_enrolled || userRole === 'admin' ?
-                    <div className="flex justify-between w-full items-center">
-                        <a className="ml-2 text-blue-600" href={`/quiz/${item.id}`}>{item.title}</a>
-                        { item.score >= 0 && <p className="text-xs text-teal-700">Score: {item.score}</p>}
-                    </div>
+            {is_enrolled || userRole === 'admin' ?
+                <div className="flex justify-between w-full items-center">
+                    <a className="ml-2 text-blue-600" href={`/quiz/${item.id}`}>{item.title}</a>
+                    {item.score >= 0 && <p className="text-xs text-teal-700">Score: {item.score}</p>}
+                </div>
                 :
                 <p className="ml-2">{item.title}</p>
             }
@@ -77,7 +77,7 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
         try {
             const res = await fetch(API_URL + '/enroll', {
                 method: "POST",
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + accessToken
                 },
@@ -97,8 +97,8 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
     return (
         <div className="grid lg:grid-cols-3 sm:grid-rows-1 mb-10">
             <div className="col-span-1 content-center">
-                <img src={item.image} alt="courses" className="border-2 col-span-1"/>
-                { !is_enrolled && role === 'student' &&
+                <img src={item.image} alt="courses" className="border-2 col-span-1" />
+                {!is_enrolled && role === 'student' &&
                     <div className="flex justify-center mt-2">
                         {
                             isLoading ?
@@ -106,13 +106,13 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
                                     <Icons.Loading className="animate-spin h-5 w-5 mr-3 inline-block" />
                                     Loading...
                                 </Button>
-                            : <button className="py-2 px-5 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => enrolledCourse()}>Enroll</button>
+                                : <button className="py-2 px-5 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => enrolledCourse()}>Enroll</button>
                         }
-                        
+
                     </div>
                 }
                 {
-                    item.instructor.email === instructorEmail && 
+                    item.instructor.email === instructorEmail &&
                     <div className="flex justify-center mt-2">
                         <button className="py-2 px-5 border-2 rounded-lg border-teal-700 bg-white text-teal-700 hover:bg-teal-700 hover:text-white transition" onClick={() => navigate(`/edit-course/${item.id}`)}>Edit</button>
                     </div>
@@ -129,9 +129,9 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
                         item.description &&
                         (showMoreDesc ? item.description : item.description.substring(0, 630) + '...')
                     }
-                    {   item.description && (item.description.length > 630 &&
+                    {item.description && (item.description.length > 630 &&
                         <button className="text-blue-400 font-semibold ml-1" onClick={() => setShowMoreDesc(!showMoreDesc)}>
-                            { showMoreDesc ? 'Show Less' : 'Show More'}
+                            {showMoreDesc ? 'Show Less' : 'Show More'}
                         </button>)
                     }
                 </p>
@@ -140,7 +140,7 @@ const CourseHeader = ({ item, is_enrolled, role }) => {
     )
 }
 
-const CourseContent = ({item, is_enrolled, orders}) => {
+const CourseContent = ({ item, is_enrolled, orders }) => {
     const [showContent, setShowContent] = useState(false)
     const lectures = [...item.lectures]
     const quizzes = [...item.quizzes]
@@ -162,15 +162,15 @@ const CourseContent = ({item, is_enrolled, orders}) => {
                 <div className="px-5 pt-5">
                     {
                         orders.map((val, idx) => {
-                            if(val === 'l'){
+                            if (val === 'l') {
                                 const content = lectures[0]
-                                lectures.splice(0,1)
-                                return <ContentLecture key={idx} item={content} is_enrolled={is_enrolled}/>
-                                
-                            } else if(val === 'q'){
+                                lectures.splice(0, 1)
+                                return <ContentLecture key={idx} item={content} is_enrolled={is_enrolled} />
+
+                            } else if (val === 'q') {
                                 const content = quizzes[0]
-                                quizzes.splice(0,1)
-                                return <ContentQuiz key={idx} item={content} is_enrolled={is_enrolled}/>
+                                quizzes.splice(0, 1)
+                                return <ContentQuiz key={idx} item={content} is_enrolled={is_enrolled} />
                             }
                         })
                     }
@@ -214,7 +214,7 @@ const CourseData = () => {
     const { data } = useSWR([`${API_URL}/course/${idOfCourse}`, accessToken], fetchData)
     const { data: order } = useSWR([`${API_URL}/course-order/${idOfCourse}`, accessToken], fetchOrder)
 
-    if(!data || !order) {
+    if (!data || !order) {
         return (
             <Loading />
         )
@@ -222,9 +222,9 @@ const CourseData = () => {
 
     if (data && order) {
         return (
-            <div className="container mx-auto mt-10">
+            <div className="container mx-auto mt-10 xl:max-w-screen-xl px-4">
                 <CourseHeader item={data.data} is_enrolled={data.is_enrolled} role={userRole} />
-                <CourseContent item={data.data} is_enrolled={data.is_enrolled} orders={order}/>
+                <CourseContent item={data.data} is_enrolled={data.is_enrolled} orders={order} />
             </div>
         )
     }

@@ -56,6 +56,7 @@ const InputQuizModal = (props) => {
       }
       const quizId = (await resContent.json()).quiz_id
       setQuiz({ ...quiz, id: quizId })
+      console.log(quizId);
     } catch (e) {
       console.log(e);
     }
@@ -104,17 +105,17 @@ const InputQuizModal = (props) => {
     handleClose()
   }
 
-  const handleTitleUpdate = () => {
-    setQuiz({ ...quiz, title })
-  }
+  // const handleTitleUpdate = () => {
+  //   setQuiz({ ...quiz, title })
+  // }
 
   const handleAddQuestion = () => {
     setQuestions([...questions, { id: -(questions.length + 1) }])
   }
 
   useEffect(() => {
-    setQuiz({ ...quiz, questions })
-  }, [questions])
+    setQuiz({ ...quiz, questions, title })
+  }, [questions, title])
 
   useEffect(() => {
     localStorage.setItem('temp', JSON.stringify(quiz))
@@ -130,7 +131,7 @@ const InputQuizModal = (props) => {
           placeholder="Insert your lecture title"
           value={title}
           onChange={e => setTitle(e.target.value)}
-          onBlur={handleTitleUpdate}
+          // onBlur={handleTitleUpdate}
           className="inline-block w-full outline outline-2 outline-slate-200 focus:outline-teal-700 px-4 py-2 rounded-lg"
         />
       </div>
@@ -246,6 +247,7 @@ const InputQuestion = ({ questions, setQuestions, idx, setActiveQuestion, quizId
 
   const handleRemoveQuestion = () => {
     if (courseId !== undefined && question.id >= 0) {
+      console.log('fire');
       handleDeleteQuestionAPI(question.id)
     }
 
