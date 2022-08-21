@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MainLayout from "../components/MainLayout";
 import Header from "../components/Header"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -231,6 +231,9 @@ const CourseData = () => {
 }
 
 export const CourseDetail = () => {
+    useEffect(() => {
+        document.title = 'Satset | Course'
+    })
     return (
         <MainLayout>
             <Header />

@@ -149,6 +149,7 @@ const CreateNewCourse = () => {
   }, [contents])
 
   useEffect(() => {
+    document.title = 'Satset | Create Course'
     localStorage.removeItem('temp')
   }, [])
 

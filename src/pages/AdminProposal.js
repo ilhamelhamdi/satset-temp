@@ -20,6 +20,7 @@ export const AdminProposal = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
+        document.title = 'Satset | Proposal'
         if (auth === null) navigate('/')
     }, [])
 

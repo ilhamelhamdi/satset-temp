@@ -150,6 +150,7 @@ const EditCourse = () => {
   }, [contents])
 
   useEffect(() => {
+    document.title = 'Satset | Create Course'
     setFetchLoading(true)
     localStorage.removeItem('temp')
   }, [])

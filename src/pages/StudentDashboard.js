@@ -59,6 +59,7 @@ const StudentDashboard = () => {
   // CHECK AUTHENTICATION
   const { auth } = useContext(AuthContext)
   useEffect(() => {
+    document.title = 'Satset | Dashboard'
     if (auth === null) navigate('/')
   }, [])
 

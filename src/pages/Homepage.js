@@ -6,7 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Carousel from "../components/Carousel";
 import Button from "../components/Button";
 import CourseCard from "../components/CourseCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { API_URL } from "../config";
 import CourseCardSkeleton from "../components/CourseCard/skeleton";
 import useSWR from "swr";
@@ -49,6 +49,10 @@ const Homepage = () => {
   for (let i = 0; i < pageIndex; i++) {
     courses.push(<CoursesList index={i + 1} key={i} />)
   }
+
+  useEffect(() => {
+    document.title = 'Satset | Homepage'
+  })
 
   return (
     <MainLayout>

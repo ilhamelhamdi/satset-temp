@@ -77,6 +77,10 @@ const InstructorDashboard = () => {
     setPageIndex(1)
   }, [courseStatus])
 
+  useEffect(() => {
+    document.title = 'Satset | Dashboard'
+  }, [])
+
 
   return (
     <MainLayout>
